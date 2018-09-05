@@ -1,8 +1,5 @@
-
 %   Author: Stefano Pagani <stefano.pagani at polimi.it>
 
-clear all
-clc
 
 % geometry  definition
 bottom_left_corner_x = 0;
@@ -46,10 +43,10 @@ mu = @(x) param(1)*(x(1,:)<0.5).*(x(2,:)<0.5) ...
    + param(9)*(x(1,:)>=1.0).*(x(1,:)<=1.5).*(x(2,:)>=1.0).*(x(2,:)<=1.5) ;
 
 % Assembler
-[A,b,uL,iN] = assembler_poisson_lifting(fespace,f,mu,dirichlet_functions,neumann_functions);
+[~,b,uL,iN] = assembler_poisson_lifting(fespace,f,mu,dirichlet_functions,neumann_functions);
 
 
-% Affine decomposition
+% affine decomposition
 mu = @(x) (x(1,:)<0.5).*(x(2,:)<0.5) ;
 [A_in{1},~,~,~] = assembler_poisson_lifting(fespace,f,mu,dirichlet_functions,neumann_functions);
 
@@ -77,19 +74,83 @@ mu = @(x) (x(1,:)>=0.5).*(x(1,:)<1.0).*(x(2,:)>=1.0).*(x(2,:)<=1.5);
 mu = @(x) (x(1,:)>=1.0).*(x(1,:)<=1.5).*(x(2,:)>=1.0).*(x(2,:)<=1.5);
 [A_in{9},~,~,~] = assembler_poisson_lifting(fespace,f,mu,dirichlet_functions,neumann_functions);
 
+[M] = assemble_mass(fespace);
 
-% Solver
-sol = uL;
 
-A = param(1)*A_in{1};
-for i=2:length(param)
-    A = A + param(i)*A_in{i};
+FOM.M           = M(iN,iN);
+FOM.A_in        = A_in;
+FOM.b           = b;
+FOM.uL          = uL;
+FOM.iN          = iN;
+FOM.dt          = 1e-2;
+FOM.T           = 1;
+FOM.Ntparam     = 10;
+FOM.fespace     = fespace;
+
+
+% offline part
+
+N_train = 100;
+N_param = 9;
+
+% training sample
+rng('default')
+param_train = 0.01 + 0.99*lhsdesign(N_train*FOM.Ntparam, N_param);
+
+% matrix of the snapshots
+S_u = [];
+
+for i_s = 1:N_train
+    
+    [solFOM] = TBpoissonTime(param_train([ 1+FOM.Ntparam*(i_s-1):FOM.Ntparam*i_s],:),FOM);
+    
+    S_u = [ S_u , solFOM(iN) ]; 
+    
 end
 
-sol(iN)  = A\b;
+% meanv = mean(S_u,2);
+% 
+% S_u_nomean = S_u  - meanv;
+% 
+% 
+% [V, ~, sigma] = POD(S_u_nomean,1e-2);
+% semilogy(sigma)
+% 
+% % projection
+% for i=1:length(A_in)
+%     
+%     A_in_ROM{i} = V'*A_in{i}*V;
+%     
+%     A_in_mean{i} = V'*A_in{i}*meanv;
+%     
+% end
+% 
+% b_ROM = V'*b;
+% 
+% % number of basis functions
+% n = size(V,2);
+% 
+% 
+% % test sample
+% N_test = 50;
+% param_test = 0.01 + 0.99*lhsdesign(N_test,N_param);
+% 
+% for i_s = 1:N_test
+%     
+%     [solROM,iNROM] = TBpoissonTime(param_test(i_s,:),M,A_in_ROM,b_ROM,zeros(n,1),[1:n],A_in_mean);
+%     
+%     [solFOM,iNFOM] = TBpoissonTime(param_test(i_s,:),M,A_in,b,uL,iN);
+%     
+%     err_u(i_s) = norm( solFOM(iNFOM) - ( meanv + V*solROM )   )./norm( solFOM(iNFOM)  );
+%     
+%     %full ROM solution
+%     uROM = uL;
+%     uROM(iN) =  V*solROM ;
+%     
+% end
+% 
+% mean(err_u)
 
 
-% plot of the solution
-plot_fe_function(sol_old,fespace)
-axis equal
-%export_vtk_scalar(sol,fespace,'example_thermal_block.vtk');
+
+
