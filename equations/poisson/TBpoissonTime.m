@@ -1,7 +1,8 @@
 function [sol] = TBpoissonTime(param,FOM)
-    % TBPOISSON
+    % TBPOISSONTIME : work in progress
 
-    %   Author: Stefano Pagani <stefano.pagani at polimi.it>
+    %   Authors: Stefano Pagani <stefano.pagani at polimi.it>
+    %            Francesco Regazzoni <francesco.regazzoni at polimi.it>
 
     ntimestep = FOM.T./FOM.dt;
 
@@ -42,10 +43,10 @@ function [sol] = TBpoissonTime(param,FOM)
         sol(FOM.iN,iT+1)  = (FOM.M + FOM.dt* A ) \ ( FOM.M*sol(FOM.iN,iT) + FOM.dt*b ) ;
         
             
-        plot_fe_function(sol(:,iT+1),FOM.fespace)
-        axis( [0 1.5 0 1.5 0 7] )
-        
-        pause(1)
+        % plot functions
+        %plot_fe_function(sol(:,iT+1),FOM.fespace)
+        %axis( [0 1.5 0 1.5 0 7] )
+        %pause(1)
     
     end
 end

@@ -1,3 +1,9 @@
+% example with a parametrized thermal block (sub-block conductivity
+% parametrized \mu = [0.01,1]^9) 
+% Problems specs in Manzoni, Pagani, Lassila "Accurate Solution of Bayesian
+% Inverse Uncertainty Quantification Problems Combining Reduced Basis
+% Methods and Reduction Error Models", SIAM JUQ, 2016
+% Read More: https://epubs.siam.org/doi/10.1137/140995817"
 
 %   Author: Stefano Pagani <stefano.pagani at polimi.it>
 
@@ -79,17 +85,17 @@ mu = @(x) (x(1,:)>=1.0).*(x(1,:)<=1.5).*(x(2,:)>=1.0).*(x(2,:)<=1.5);
 
 
 % Solver
-sol = uL;
+sol = uL; % lifting
 
 A = param(1)*A_in{1};
 for i=2:length(param)
     A = A + param(i)*A_in{i};
 end
 
-sol(iN)  = A\b;
+sol(iN)  = A\b;  % solution on the internal nodes
 
 
 % plot of the solution
-plot_fe_function(sol_old,fespace)
-axis equal
+plot_fe_function(sol,fespace)
+%axis equal
 %export_vtk_scalar(sol,fespace,'example_thermal_block.vtk');

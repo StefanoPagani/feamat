@@ -1,5 +1,7 @@
+% example with a parametrized conductivity expressed through a KL
+% decomposition - Stochastic Galerkin benchmark
 
-%   Author: Stefano Pagani <stefano.pagani at polimi.it>
+% Author: Stefano Pagani <stefano.pagani at polimi.it>
 
 clear all
 clc
@@ -70,11 +72,8 @@ for i_KL=1:numRV
 
 end
 
-
-
 % random sample
 psi = randn(numRV,1);
-
 
 % linear combination
 A = A_mean;    
@@ -82,7 +81,6 @@ for i_KL=1:numRV
     A = A + psi(i_KL)*A_in{i_KL};
     b = b + psi(i_KL)*b_in{i_KL};
 end
-
 
 % Solver
 sol = uL;

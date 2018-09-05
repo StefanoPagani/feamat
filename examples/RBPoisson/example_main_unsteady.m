@@ -1,4 +1,8 @@
-%   Author: Stefano Pagani <stefano.pagani at polimi.it>
+% example with a parametrized conductivity expressed through a KL
+% decomposition - Stochastic Galerkin benchmark
+
+%   Authors: Stefano Pagani <stefano.pagani at polimi.it>
+%            Francesco Regazzoni <francesco.regazzoni at polimi.it>
 
 
 % geometry  definition
@@ -104,9 +108,11 @@ for i_s = 1:N_train
     
     [solFOM] = TBpoissonTime(param_train([ 1+FOM.Ntparam*(i_s-1):FOM.Ntparam*i_s],:),FOM);
     
-    S_u = [ S_u , solFOM(iN) ]; 
+    S_u = [ S_u , solFOM(iN,:) ]; 
     
 end
+
+% TO-DO adapt ROM part 
 
 % meanv = mean(S_u,2);
 % 

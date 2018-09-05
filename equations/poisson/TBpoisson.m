@@ -1,5 +1,6 @@
 function [sol] = TBpoisson(param,A_in,b,uL,iN,A_in_mean)
-    % TBPOISSON
+    % TBPOISSON implements the solution of the Poisson thermal block
+    % problem
 
     %   Author: Stefano Pagani <stefano.pagani at polimi.it>
 

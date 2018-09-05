@@ -136,7 +136,7 @@ for i_s = 1:N_test
     
     [solFOM] = TBpoisson(param_test(i_s,:),A_in,b,uL,iN);
     
-    err_u(i_s) = norm( solFOM(iNFOM) - ( meanv + V*solROM )   )./norm( solFOM(iNFOM)  );
+    err_u(i_s) = norm( solFOM(iN) - ( meanv + V*solROM )   )./norm( solFOM(iN)  );
     
     %full ROM solution
     uROM = uL;
