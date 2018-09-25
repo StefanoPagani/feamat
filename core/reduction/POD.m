@@ -1,8 +1,19 @@
-function [U, V, sigma] = POD(S,tolP)
+function [U, V, sigma] = POD(S,tolP,Hnorm)
             %POD proper orthogonal decomposition algorithm
-
+            
             % svd method
-            [U,Sigma,V] = svd(S,'econ');
+            if nargin==2
+                [U,Sigma,V] = svd(S,'econ');
+            else
+                [Low, flag, prm] = chol(Hnorm,'lower','vector');
+                S               = Low'*S(prm,:);
+                invp            = 0*prm;
+                invp(prm)       = 1:length(prm);
+                S               = S(invp,:);               
+                [U, Sigma, V]   = svd(S,'econ');
+                U               = Low' \ U(prm,:);
+                U               = U(invp,:);
+            end
 
             % singular values
             sigma = diag(Sigma);
